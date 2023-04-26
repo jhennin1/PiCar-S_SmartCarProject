@@ -13,7 +13,6 @@ during a semester-long class project where I worked with the PiCar-S Smart Car.
 * Update      : Dream    2016-10-08    New release
 **********************************************************************
 '''
-
 from SunFounder_Line_Follower import Line_Follower
 from SunFounder_Ultrasonic_Avoidance import Ultrasonic_Avoidance
 from picar import front_wheels
@@ -27,7 +26,6 @@ ua = Ultrasonic_Avoidance.Ultrasonic_Avoidance(20)
 lf = Line_Follower.Line_Follower()
 fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
-adc = ADC()
 
 REFERENCES = [225, 225, 225, 225, 225]
 #calibrate = True
@@ -35,8 +33,6 @@ calibrate = False
 forward_speed = 60
 backward_speed = 70
 turning_angle = 45
-
-max_off_track_count = 40
 
 delay = 0.0005
 
@@ -89,8 +85,7 @@ def cali():
 def state_line():
 	#print("start_follow")
 	global turning_angle
-    global step
-	off_track_count = 0
+   	global step
 	bw.speed = forward_speed
 
 	a_step = 5
@@ -115,31 +110,25 @@ def state_line():
 			step = d_step
 
 		# Direction calculate
-		if	lt_status_now == [0,0,1,0,0]:
-			off_track_count = 0
-			fw.turn(90)
+		If lt_status_now == [0,0,1,0,0]:
 			line_flag = 0
+			return line_flag
             
 		# turn right
 		elif lt_status_now in ([0,1,1,0,0],[0,1,0,0,0],[1,1,0,0,0],[1,0,0,0,0]):
-			off_track_count = 0
-			turning_angle = int(90 - step)
 			line_flag = 1
+			return line_flag
             
 		# turn left
 		elif lt_status_now in ([0,0,1,1,0],[0,0,0,1,0],[0,0,0,1,1],[0,0,0,0,1]):
-			off_track_count = 0
-			turning_angle = int(90 + step)
 			line_flag = 2
+			return line_flag
             
 		# all on white surface
 		elif lt_status_now == [0,0,0,0,0]:
-            off_track_count += 1
 			line_flag = 3
+			return line_flag
 		
-
-		return line_flag
-
 def state_sonic():
 	#print("start_avoidance")
 	distance = ua.get_distance()
